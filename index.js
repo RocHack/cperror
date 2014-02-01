@@ -1,6 +1,6 @@
 var irc = require('irc');
 var client = new irc.Client('irc.freenode.net', 'cperror', {
-    channels: ['###rochack'],
+    channels: ['##rochack'],
 });
 var complaints = [
 	'Listen for 30 seconds and then give yourself a 1 minute break.',
@@ -43,7 +43,7 @@ client.addListener('message', function (from, to, message) {
 	console.log(from, to, message);
 	if(message.indexOf('cperror') != -1) {
 		var response = produce_response(message);
-    	client.say('###rochack', response);
+    	client.say('##rochack', response);
     	console.log(response);
 	}
 });
