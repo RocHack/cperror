@@ -1,6 +1,6 @@
 var irc = require('irc');
 var client = new irc.Client('irc.freenode.net', 'cperror', {
-    channels: ['##rochack'],
+    channels: [],
 });
 var complaints = [
 	'Listen for 30 seconds and then give yourself a 1 minute break.',
