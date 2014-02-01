@@ -43,8 +43,13 @@ client.addListener('message', function (from, to, message) {
 	console.log(from, to, message);
 	if(message.indexOf('cperror') != -1) {
 		var response = produce_response(message);
-    	client.say(to, response);
-    	console.log(response);
+		if(to=="cperror") {
+			client.say(from, response);
+			console.log(response);
+		} else {
+			client.say(to, response);
+			console.log(response);
+		}
 	}
 });
 
