@@ -43,7 +43,7 @@ client.addListener('message', function (from, to, message) {
 	console.log(from, to, message);
 	if(message.indexOf('cperror') != -1) {
 		var response = produce_response(message);
-    	client.say('##rochack', response);
+    	client.say(to, response);
     	console.log(response);
 	}
 });
