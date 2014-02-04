@@ -1,6 +1,8 @@
 var irc = require('irc');
+
+var channels = ['###rochack']
 var client = new irc.Client('irc.freenode.net', 'cperror', {
-    channels: ['##rochack'],
+    channels: channels,
 });
 var complaints = [
 	'Listen for 30 seconds and then give yourself a 1 minute break.',
@@ -41,16 +43,40 @@ var inspirations = [
 
 client.addListener('message', function (from, to, message) {
 	console.log(from, to, message);
-	if(message.indexOf('cperror') != -1) {
-		var response = produce_response(message);
-		if(to=="cperror") {
-			client.say(from, response);
-			console.log(response);
-		} else {
+	// see whether we should respond to the message
+	var to_respond = response_type(from, to, message);
+
+	// respond, depending on the type of response we want
+	var response = "";
+	switch(to_respond) {
+		case 0: break;
+		case 1:
+			response = produce_response(message);
 			client.say(to, response);
-			console.log(response);
-		}
+			break;
+		case 2:
+			response = produce_positive_response(message);
+			client.say(to, response);
+			break;
+		case 3:
+			response = produce_negative_response(message);
+			client.say(to, response);
+			break;
+		case 4:
+			response = produce_response(message);
+			client.say(from, response);
+			break;
+		case 5:
+			response = produce_positive_response(message);
+			client.say(from, response);
+			break;
+		case 6:
+			response = produce_negative_response(message);
+			client.say(from, response);
+			break;
 	}
+
+	console.log(response);
 });
 
 // produces a response to a given complaint (only if cperror is said in the message)
@@ -58,11 +84,52 @@ var produce_response = function(message) {
 	var which_type_of_message = Math.round(Math.random());
 	var response = "";
 	if(which_type_of_message == 0) {
-		response = complaints[Math.floor(Math.random()*(complaints.length))];
+		response = produce_positive_response(message);
 	} else {
-		response = inspirations[Math.floor(Math.random()*(inspirations.length))];
+		response = produce_negative_response(message);
 	}
 	return response;
+}
+// produces a positive response to the given complaint
+var produce_positive_response = function(message) {
+	return inspirations[Math.floor(Math.random()*(inspirations.length))];
+}
+// produces a negative response to the given complaint
+var produce_negative_response = function(message) {
+	return complaints[Math.floor(Math.random()*(complaints.length))];
+}
+
+// checks to see whether we should respond to a certain message, and returns an integer representing what type of response
+// cperror should give
+/*
+	RESPONSE TYPES:
+		0: no response
+		1: general response to the channel
+		2: "positive" response to the channel
+		3: "negative" response to the channel
+		4: general response to a user
+		5: "positive" response to a user
+		6: "negative" response to a user
+*/
+var response_type = function(from, to, message) {
+	// respond to a user
+	if(to==="cperror") {
+		return positive_negative_test(message)+1;
+	} 
+	// respond to the channel
+	else if(channels.indexOf(to) != -1) {
+		return positive_negative_test(message)+4;
+	}
+	// do nothing
+	else {
+		return 0;
+	}
+}
+
+// determines whether to emit a positive, negative, or either type of message
+// returns 0 if general, 1 if positive, or 2 if negative
+var positive_negative_test = function(message) {
+	return 0; // placeholder
 }
 
 
