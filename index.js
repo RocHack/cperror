@@ -1,6 +1,6 @@
 var irc = require('irc');
 
-var channels = ['###rochack']
+var channels = ['##rochack']
 var client = new irc.Client('irc.freenode.net', 'cperror', {
     channels: channels,
 });
@@ -40,12 +40,18 @@ var inspirations = [
 	'ACTUALLY LISTEN TO YOUR PROFESSOR FOR ONCE! After all, your professor is probably a lot smarter than you, and knows what he\'s talking about.',
 	'If you use me one more time, I\'ll consider banning you from complaining for the rest of the semester.'
 ];
+// a list of words for which cperror should respond
+var response_words = [
+	"cperror",
+	"complain"
+];
+
 
 client.addListener('message', function (from, to, message) {
 	console.log(from, to, message);
 	// see whether we should respond to the message
 	var to_respond = response_type(from, to, message);
-
+	console.log("to_respond is", to_respond);
 	// respond, depending on the type of response we want
 	var response = "";
 	switch(to_respond) {
@@ -113,12 +119,12 @@ var produce_negative_response = function(message) {
 */
 var response_type = function(from, to, message) {
 	// respond to a user
-	if(to==="cperror") {
-		return positive_negative_test(message)+1;
+	if(to==="cperror" && from!=="cperror") {
+		return positive_negative_test(message)+4;
 	} 
 	// respond to the channel
-	else if(channels.indexOf(to) != -1) {
-		return positive_negative_test(message)+4;
+	else if(channels.indexOf(to) != -1 && contains_response_words(message)) {
+		return positive_negative_test(message)+1;
 	}
 	// do nothing
 	else {
@@ -132,7 +138,13 @@ var positive_negative_test = function(message) {
 	return 0; // placeholder
 }
 
-
+// determines whether a message contains a "response" word, defined in a global variable
+var contains_response_words = function(message) {
+	for(var i = 0; i < response_words.length; i++) {
+		if(message.indexOf(response_words[i]) > -1) return true;
+	}
+	return false;
+}
 
 
 
